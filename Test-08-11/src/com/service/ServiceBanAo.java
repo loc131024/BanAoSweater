@@ -18,23 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceBanAo {
-    
-    
 
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
     String sql = null;
 
-    
-   public List<SanPhamChiTiet> getSPCT(){
-       List<SanPhamChiTiet> list = new ArrayList();
-       sql="select MASP,MAMS,MACL,MASIZE,SOLUONG,GIA,TRANGTHAI from CHITIETSANPHAM";
-       try {
-           con = DBConnect111.getConnection();
+    public List<SanPhamChiTiet> getSPCT() {
+        List<SanPhamChiTiet> list = new ArrayList();
+        sql = "select MASP,MAMS,MACL,MASIZE,SOLUONG,GIA,TRANGTHAI from CHITIETSANPHAM";
+        try {
+            con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 SanPhamChiTiet spct = new SanPhamChiTiet();
                 spct.setMaSP(rs.getString("MASP"));
                 spct.setMaMS(rs.getInt("MAMS"));
@@ -46,22 +43,22 @@ public class ServiceBanAo {
                 list.add(spct);
             }
             return list;
-       } catch (Exception e) {
-           return null;
-       }
- 
-           
-   }
-   public SanPhamChiTiet getSPCTByMaSP(String maSP){
-       SanPhamChiTiet spct = null;
-       sql="select MASP,MAMS,MACL,MASIZE,SOLUONG,GIA,TRANGTHAI from CHITIETSANPHAM where MASP=?";
-       try {
-           con = DBConnect111.getConnection();
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+    public List<SanPhamChiTiet> getListSPCTByMaSP(String ma) {
+         ma = "%"+ma+"%";
+        List<SanPhamChiTiet> list = new ArrayList();
+        sql = "select MASP,MAMS,MACL,MASIZE,SOLUONG,GIA,TRANGTHAI from CHITIETSANPHAM where MASP like ?";
+        try {
+            con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
-            ps.setObject(1, maSP);
+            ps.setObject(1, ma);
             rs = ps.executeQuery();
-            while(rs.next()){
-                 spct = new SanPhamChiTiet();
+            while (rs.next()) {
+                SanPhamChiTiet spct = new SanPhamChiTiet();
                 spct.setMaSP(rs.getString("MASP"));
                 spct.setMaMS(rs.getInt("MAMS"));
                 spct.setMaCL(rs.getInt("MACL"));
@@ -69,15 +66,41 @@ public class ServiceBanAo {
                 spct.setSoLuong(rs.getInt("SOLUONG"));
                 spct.setGia(rs.getDouble("GIA"));
                 spct.setTrangThai(rs.getString("TRANGTHAI"));
-                
+                list.add(spct);
+            }
+            return list;
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public SanPhamChiTiet getSPCTByMaSP(String maSP) {
+        SanPhamChiTiet spct = null;
+        sql = "select MASP,MAMS,MACL,MASIZE,SOLUONG,GIA,TRANGTHAI from CHITIETSANPHAM where MASP=?";
+        try {
+            con = DBConnect111.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setObject(1, maSP);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                spct = new SanPhamChiTiet();
+                spct.setMaSP(rs.getString("MASP"));
+                spct.setMaMS(rs.getInt("MAMS"));
+                spct.setMaCL(rs.getInt("MACL"));
+                spct.setMaSize(rs.getInt("MASIZE"));
+                spct.setSoLuong(rs.getInt("SOLUONG"));
+                spct.setGia(rs.getDouble("GIA"));
+                spct.setTrangThai(rs.getString("TRANGTHAI"));
+
             }
             return spct;
-       } catch (Exception e) {
-           return null;
-       }
- 
-           
-   }
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
     public List<SanPham> getSP() {
         List<SanPham> list = new ArrayList();
         sql = "select MASP,TENSP,SOLUONG from SANPHAM";
@@ -97,16 +120,37 @@ public class ServiceBanAo {
             return null;
         }
     }
+    public List<SanPham> getSPByMaSP(String ma) {
+        ma = "%"+ma+"%";
+        List<SanPham> list = new ArrayList();
+        sql = "select MASP,TENSP,SOLUONG from SANPHAM where MASP like ?";
+        try {
+            con = DBConnect111.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setObject(1, ma);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                SanPham sp = new SanPham();
+                sp.setMaSP(rs.getString("MASP"));
+                sp.setTen(rs.getString("TENSP"));
+                sp.setSoLuong(rs.getInt("SOLUONG"));
+                list.add(sp);
+            }
+            return list;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public List<MauSac> getMauSac() {
         List<MauSac> list = new ArrayList();
-        sql = "select TENMAU from MAUSAC";
+        sql = "select MAMS,TENMAU from MAUSAC";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                MauSac ms = new MauSac(rs.getString(1));
+                MauSac ms = new MauSac(rs.getInt(1), rs.getString(2));
                 list.add(ms);
             }
             return list;
@@ -117,13 +161,13 @@ public class ServiceBanAo {
 
     public List<Size> getSize() {
         List<Size> list = new ArrayList();
-        sql = "select TENSIZE from SIZE";
+        sql = "select MASIZE, TENSIZE from SIZE";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Size size = new Size(rs.getString(1));
+                Size size = new Size(rs.getInt(1), rs.getString(2));
                 list.add(size);
             }
             return list;
@@ -134,13 +178,13 @@ public class ServiceBanAo {
 
     public List<ChatLieu> getChatLieu() {
         List<ChatLieu> list = new ArrayList();
-        sql = "select TENCHATLIEU FROM CHATLIEU";
+        sql = "select MACL,TENCHATLIEU FROM CHATLIEU";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                ChatLieu cl = new ChatLieu(rs.getString(1));
+                ChatLieu cl = new ChatLieu(rs.getInt(1), rs.getString(2));
                 list.add(cl);
             }
             return list;
@@ -165,6 +209,7 @@ public class ServiceBanAo {
             return null;
         }
     }
+
     public String getTenMau(String ma) {
         sql = "select TENMAU from MAUSAC where MAMS=?";
         MauSac ms = null;
@@ -208,13 +253,14 @@ public class ServiceBanAo {
             ps.setObject(1, ma);
             rs = ps.executeQuery();
             while (rs.next()) {
-                cl = new ChatLieu(ma);
+                cl = new ChatLieu(rs.getString(1));
             }
             return cl.getTenCL();
         } catch (Exception e) {
             return null;
         }
     }
+
     public int getMaMau(String ten) {
         sql = "select MAMS from MauSac where TENMAU=?";
         MauSac ms = null;
@@ -248,6 +294,7 @@ public class ServiceBanAo {
             return 0;
         }
     }
+
     public int getMaCL(String ten) {
         sql = "select MACL from CHATLIEU where TENCHATLIEU=?";
         ChatLieu cl = null;
@@ -265,15 +312,13 @@ public class ServiceBanAo {
         }
     }
 
-    
-
     public int addSanPham(SanPham sp) {
 
         sql = "insert into SANPHAM values ('SP'+CAST((select COUNT(*) from SANPHAM)+1 as varchar(10)),?,?)";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setObject(1, sp.getTen());
             ps.setObject(2, sp.getSoLuong());
 
@@ -282,9 +327,10 @@ public class ServiceBanAo {
             return 0;
         }
     }
+
     public int addSanPhamCT(SanPhamChiTiet spct) {
 
-        sql = "insert into CHITIETSANPHAM values (?,?,?,?,null,?,?,?,?)";
+        sql = "insert into CHITIETSANPHAM values (?,?,?,?,null,?,?,?,null)";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
@@ -294,22 +340,21 @@ public class ServiceBanAo {
             ps.setObject(4, spct.getMaSize());
             ps.setObject(5, spct.getSoLuong());
             ps.setObject(6, spct.getGia());
-            ps.setObject(7, spct.getMoTa());
-            ps.setObject(8, spct.getTrangThai());
-            
+            ps.setObject(7, spct.getTrangThai());
 
             return ps.executeUpdate();
         } catch (Exception e) {
             return 0;
         }
     }
-    public int updSanPham(SanPham sp,String ma) {
+
+    public int updSanPham(SanPham sp, String ma) {
 
         sql = "update SANPHAM set TENSP=?,SOLUONG=? where MASP=?";
         try {
             con = DBConnect111.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setObject(1, sp.getTen());
             ps.setObject(2, sp.getSoLuong());
             ps.setObject(3, ma);
